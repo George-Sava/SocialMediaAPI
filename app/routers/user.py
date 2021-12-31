@@ -61,16 +61,16 @@ async def create_admin(user: schemas.UserCreateMin,db: Session = Depends(get_db)
 
 
 
-#Endpoint for creating individual user posts 
+# #Endpoint for creating individual user posts 
 
-@router.post("/{user_id}/post/", response_model=schemas.Post)
-def create_post_for_user_by_id(
-    user_id:int, post: schemas.CreatedPost, db: Session = Depends(get_db), oauth_token: schemas.TokenData = Depends(oauth2.get_current_user)
-):
+# @router.post("/{user_id}/post/", response_model=schemas.Post)
+# def create_post_for_user_by_id(
+#     user_id:int, post: schemas.CreatedPost, db: Session = Depends(get_db), oauth_token: schemas.TokenData = Depends(oauth2.get_current_user)
+# ):
     
-    verify_user_permission(user_id=user_id,oauth_token=oauth_token)
+#     verify_user_permission(user_id=user_id,oauth_token=oauth_token)
     
-    return create_user_post(db=db, post=post, user_id=user_id)
+#     return create_user_post(db=db, post=post, user_id=user_id)
 
 
 # Endpoint for returning All users

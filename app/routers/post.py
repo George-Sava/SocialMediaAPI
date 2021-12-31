@@ -1,4 +1,4 @@
-from fastapi import status, HTTPException, Depends, APIRouter
+from fastapi import status, HTTPException, Depends, APIRouter, Response
 from sqlalchemy.sql.functions import func
 from app.schemas import PatchedPost, Post, PostOut, ReplacePost
 from sqlalchemy import desc
@@ -125,3 +125,20 @@ async def replace_post_of_logged_user(id: int, post: ReplacePost, db: Session = 
     
     return post_data
     
+# DELETE method, url: "/post/{id}" --> removes Post by Id
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_post_for_logged_user(post_id: int, db: Session = Depends(get_db), oauth_token: schemas.TokenData = Depends(oauth2.get_current_user)):
+    
+    post_querry = db.query(models.Post).filter(models.Post.id == post_id, models.Post.owner_id == oauth_token.id)
+    
+    post = post_querry.first()
+    
+    verify_user_permission_for_post(post,oauth_token)
+    
+    if post_querry.first() == None:
+        raise HTTPException(status_code= status.HTTP_404_NOT_FOUND, detail=f"Post with id: {id}, does not exist!")
+    post_querry.delete(synchronize_session=False)
+    db.commit()
+    
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
