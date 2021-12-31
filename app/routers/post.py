@@ -55,7 +55,7 @@ async def get_latest_post_for_logged_user(db: Session = Depends(get_db), oauth_t
 #   LIMIT 1 """).fetchone()
     post_data = db.query(models.Post, func.count(models.Like.post_id).label("likes")).join(models.Like, models.Like.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.owner_id == oauth_token.id).order_by(desc(models.Post.created_at)).first()
     
-    verify_user_permission_for_post(post_data[0],oauth_token)
+    verify_user_permission_for_post(post_data,oauth_token)
     
     return post_data
 
