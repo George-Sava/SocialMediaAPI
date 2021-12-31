@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from app import oauth2, schemas, models
 from app.dabase import engine, get_db
-from app.functions import  cleanNullTerms, get_all_posts_and_likes, verify_if_admin , verify_user_permission_for_post
+from app.functions import  cleanNullTerms, create_user_post, get_all_posts_and_likes, verify_if_admin , verify_user_permission_for_post
 
 router = APIRouter(
     prefix="/posts", 
@@ -59,6 +59,13 @@ async def get_latest_post_for_logged_user(db: Session = Depends(get_db), oauth_t
     
     return post_data
 
+
+# Endpoint for creating post for the current logged user
+# @router.get("/all", response_model=List[schemas.PostOut])
+@router.post("/", response_model=PostOut)
+def create_post_for_logged_user( post: schemas.CreatedPost, db: Session = Depends(get_db), oauth_token: schemas.TokenData = Depends(oauth2.get_current_user)):
+    post = create_user_post(db,post,oauth_token.id)
+    return post
 
 # Method PATCH, url: "/posts/{id}" --> update a post by id
 
