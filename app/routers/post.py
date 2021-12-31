@@ -1,6 +1,6 @@
 from fastapi import status, HTTPException, Depends, APIRouter
 from sqlalchemy.sql.functions import func
-from app.schemas import PatchedPost, PostOut, ReplacePost
+from app.schemas import PatchedPost, Post, PostOut, ReplacePost
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -62,7 +62,7 @@ async def get_latest_post_for_logged_user(db: Session = Depends(get_db), oauth_t
 
 # Endpoint for creating post for the current logged user
 # @router.get("/all", response_model=List[schemas.PostOut])
-@router.post("/", response_model=PostOut)
+@router.post("/", response_model=Post)
 def create_post_for_logged_user( post: schemas.CreatedPost, db: Session = Depends(get_db), oauth_token: schemas.TokenData = Depends(oauth2.get_current_user)):
     post = create_user_post(db,post,oauth_token.id)
     return post
