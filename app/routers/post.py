@@ -13,6 +13,22 @@ router = APIRouter(
     tags=['Posts']
 )
 
+# Request GET method, url: "/posts/latest" --> returns latest Post of Logged user
+
+@router.get("/latest", response_model=schemas.PostOut)
+async def get_latest_post_for_logged_user(db: Session = Depends(get_db), oauth_token: schemas.TokenData = Depends(oauth2.get_current_user)):
+#     post = cur.execute("""SELECT * FROM posts ORDER BY created_at DESC
+#   LIMIT 1 """).fetchone()
+    print(oauth_token)
+    post_data = db.query(models.Post, func.count(models.Like.post_id).label("likes")).join(models.Like, models.Like.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.owner_id == int(oauth_token.id)).order_by(desc(models.Post.created_at)).first()
+    
+    print("Data: ",post_data[0])
+    
+    # verify_user_permission_for_post(post_data[0],oauth_token)
+    
+    return post_data
+
+
 # Endpoint for getting all posts
 # @router.get("/all", response_model=List[schemas.PostOut])
 @router.get("/all", response_model=List[PostOut])
@@ -47,17 +63,6 @@ async def get_posts_for_logged_user(skip: int = 0, limit: int = 50,db: Session =
     return data
 
 
-# Request GET method, url: "/posts/latest" --> returns latest Post of Logged user
-
-@router.get("/latest", response_model=schemas.PostOut)
-async def get_latest_post_for_logged_user(db: Session = Depends(get_db), oauth_token: schemas.TokenData = Depends(oauth2.get_current_user)):
-#     post = cur.execute("""SELECT * FROM posts ORDER BY created_at DESC
-#   LIMIT 1 """).fetchone()
-    post_data = db.query(models.Post, func.count(models.Like.post_id).label("likes")).join(models.Like, models.Like.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.owner_id == oauth_token.id).order_by(desc(models.Post.created_at)).first()
-    
-    verify_user_permission_for_post(post_data,oauth_token)
-    
-    return post_data
 
 
 # Endpoint for creating post for the current logged user
