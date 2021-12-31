@@ -22,9 +22,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# @app.get('/')
-# def hello():
-#     return {"message": "Hello ANA!"}
+
+@app.get('/')
+def hello():
+    return {"message": "App is running! Go to https://socialmediaapi-fastapi.herokuapp.com/docs#/ for the Social Media API documentation "}
 
 app.include_router(post.router)
 app.include_router(user.router)
